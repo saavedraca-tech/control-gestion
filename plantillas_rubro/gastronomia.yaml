@@ -1,0 +1,49 @@
+# Plantilla GASTRONOMÍA (bar, café, restaurante, rotisería…)
+hereda: generico
+nombre: Gastronomía
+descripcion: Vende cubiertos; costo de mercadería (food cost), personal y alquiler son la clave
+unidad_sugerida: {nombre: cubierto, plural: cubiertos}
+rubro_principal: Materia prima e insumos
+
+rubros:
+  - {nombre: Materia prima e insumos, tipo: variable}
+  - {nombre: Bebidas, tipo: variable}
+  - {nombre: Alquiler, tipo: fijo}
+  - {nombre: Energía, tipo: fijo, devengamiento: mes_factura}
+
+reglas_tipicas:
+  - {contiene: CERVECER, rubro: Bebidas}
+  - {contiene: COCA COLA, rubro: Bebidas}
+  - {contiene: QUILMES, rubro: Bebidas}
+  - {contiene: FRIGORIF, rubro: Materia prima e insumos}
+  - {contiene: CARNES, rubro: Materia prima e insumos}
+  - {contiene: VERDULER, rubro: Materia prima e insumos}
+  - {contiene: LACTEOS, rubro: Materia prima e insumos}
+  - {contiene: PANADER, rubro: Materia prima e insumos}
+
+kpis:
+  - {id: food_cost, base: rubro_sobre_ventas, params: {rubro: Materia prima e insumos},
+     nombre: "Costo de mercadería / ventas (food cost)", estrella: true, meta: 0.32, direccion: "≤", tolerancia: 0.04}
+  - {id: bebidas_ventas, base: rubro_sobre_ventas, params: {rubro: Bebidas}, nombre: "Bebidas / ventas",
+     meta: 0.12, direccion: "≤", tolerancia: 0.03}
+  - {id: alquiler_ventas, base: rubro_sobre_ventas, params: {rubro: Alquiler}, nombre: "Alquiler / ventas",
+     estrella: true, meta: 0.10, direccion: "≤", tolerancia: 0.03}
+  - {id: precio_promedio_unidad, nombre: "Ticket por cubierto", estrella: true}
+  - {id: unidades_vendidas, nombre: "Cubiertos vendidos"}
+  - {id: merma_pct, meta: 0.04, direccion: "≤", tolerancia: 0.02}
+  - {id: energia_ventas, base: rubro_sobre_ventas, params: {rubro: Energía}, nombre: "Energía / ventas",
+     meta: 0.06, direccion: "≤", tolerancia: 0.02}
+
+parte_operativo:
+  columnas:
+    fecha: fecha
+    unidades_vendidas: cubiertos
+    unidades_producidas: platos_preparados
+    unidades_descartadas: platos_descartados
+    caja_efectivo: caja_efectivo
+
+iibb:
+  actividades:
+    - {nombre: Gastronomía, alicuota: 0.035}
+  criterio: porcentaje
+  porcentaje: {Gastronomía: 1.0}

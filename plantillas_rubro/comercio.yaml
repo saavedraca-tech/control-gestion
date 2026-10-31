@@ -1,0 +1,34 @@
+# Plantilla COMERCIO (compra y reventa: almacén, ferretería, indumentaria, distribuidora…)
+hereda: generico
+nombre: Comercio
+descripcion: Compra mercadería y la revende; el margen sobre la mercadería es la clave
+unidad_sugerida: {nombre: unidad, plural: unidades}
+rubro_principal: Mercadería
+
+rubros:
+  - {nombre: Mercadería, tipo: variable}
+  - {nombre: Alquiler, tipo: fijo}
+
+kpis:
+  - {id: mercaderia_ventas, base: rubro_sobre_ventas, params: {rubro: Mercadería}, nombre: "Costo de mercadería / ventas",
+     estrella: true, meta: 0.65, direccion: "≤", tolerancia: 0.05}
+  - {id: alquiler_ventas, base: rubro_sobre_ventas, params: {rubro: Alquiler}, nombre: "Alquiler / ventas",
+     meta: 0.10, direccion: "≤", tolerancia: 0.03}
+  - {id: ticket_promedio, estrella: true}
+  - {id: clientes_activos, estrella: true}
+  - {id: dias_cobertura, meta: [15, 45], tolerancia: 10}
+  - {id: merma_pct, meta: 0.02, direccion: "≤", tolerancia: 0.01}
+
+parte_operativo:
+  columnas:
+    fecha: fecha
+    unidades_vendidas: unidades_vendidas
+    stock_unidades: unidades_en_stock
+    unidades_descartadas: unidades_descartadas
+    caja_efectivo: caja_efectivo
+
+iibb:
+  actividades:
+    - {nombre: Comercio, alicuota: 0.035}
+  criterio: porcentaje
+  porcentaje: {Comercio: 1.0}

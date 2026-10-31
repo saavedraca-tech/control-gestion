@@ -1,0 +1,8 @@
+clientes/
+estudio/
+referencia/
+tests/
+web/frontend/
+**/__pycache__
+**/node_modules
+.git

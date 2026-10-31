@@ -1,0 +1,44 @@
+# Plantilla FÁBRICA (producción propia: hielo, panificados, alimentos, metalúrgica liviana…)
+hereda: generico
+nombre: Fábrica
+descripcion: Produce y vende su propio producto; energía y logística suelen ser costos clave
+unidad_sugerida: {nombre: unidad, plural: unidades}
+rubro_principal: Energía
+
+rubros:
+  - {nombre: Energía, tipo: variable, devengamiento: mes_anterior}
+  - {nombre: Mantenimiento, tipo: fijo}
+
+kpis:
+  - {id: precio_promedio_unidad, estrella: true}
+  - {id: energia_ventas, base: rubro_sobre_ventas, params: {rubro: Energía}, estrella: true,
+     meta: 0.30, direccion: "≤", tolerancia: 0.05}
+  - {id: consumo_unitario, nombre: "kWh por unidad", estrella: true}
+  - {id: logistica_ventas, base: rubro_sobre_ventas, params: {rubro: Combustible y logística},
+     nombre: "Logística / ventas", meta: 0.12, direccion: "≤", tolerancia: 0.03}
+  - {id: dias_cobertura, estrella: true, meta: [2, 5], tolerancia: 1}
+  - {id: merma_pct, meta: 0.03, direccion: "≤", tolerancia: 0.01}
+  - {id: dias_stock_insumo, meta: 7, direccion: "≥", tolerancia: 3}
+  - {id: unidades_vendidas}
+  - {id: margen_contribucion_unidad}
+  - {id: punto_equilibrio_unidades}
+  - {id: horas_parada, meta: 4, direccion: "≤", tolerancia: 4}
+
+parte_operativo:
+  columnas:
+    fecha: fecha
+    unidades_producidas: unidades_producidas
+    unidades_vendidas: unidades_vendidas
+    unidades_descartadas: unidades_descartadas
+    stock_unidades: unidades_en_stock
+    lectura_medidor: lectura_medidor_kwh
+    stock_insumo: insumo_stock
+    horas_parada: horas_parada
+    caja_efectivo: caja_efectivo
+
+iibb:
+  actividades:
+    - {nombre: Elaboración, alicuota: 0.01}
+    - {nombre: Venta, alicuota: 0.035}
+  criterio: pendiente
+  usar_en_resultado: maximo

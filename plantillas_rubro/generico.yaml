@@ -1,0 +1,109 @@
+# Plantilla GENÉRICA: base para todos los rubros. Las demás plantillas heredan de esta
+# (hereda: generico) y agregan o cambian lo propio del rubro.
+# nuevo_cliente.py copia esto a clientes/<cliente>/config/ y después se edita ahí.
+
+nombre: Genérico
+descripcion: PyME de cualquier rubro
+unidad_sugerida: {nombre: unidad, plural: unidades}
+temporada_alta_sugerida: []
+rubro_principal: null
+
+# --------------------------------------------------------------------------- rubros de gasto
+# tipo: variable (crece con las ventas) o fijo (se paga igual). Sirve para el punto de equilibrio
+#       y para la "caja en días de gastos fijos".
+# devengamiento: mes_factura (por defecto) o mes_anterior (servicios que se facturan a mes vencido).
+# operativo: false -> no entra en el resultado operativo.
+# personal: true  -> facturas de personas que en realidad son personal (suman al costo laboral).
+rubros:
+  - {nombre: Materia prima e insumos, tipo: variable}
+  - {nombre: Mercadería, tipo: variable}
+  - {nombre: Envases, tipo: variable}
+  - {nombre: Energía, tipo: variable, devengamiento: mes_factura}
+  - {nombre: Combustible y logística, tipo: variable}
+  - {nombre: Mantenimiento, tipo: fijo}
+  - {nombre: Alquiler, tipo: fijo}
+  - {nombre: Servicios y telecomunicaciones, tipo: fijo}
+  - {nombre: Honorarios, tipo: fijo}
+  - {nombre: Seguros, tipo: fijo}
+  - {nombre: Bancos, tipo: fijo}
+  - {nombre: Impuestos y tasas, tipo: fijo}
+  - {nombre: Personal no registrado (facturas), tipo: fijo, personal: true}
+  - {nombre: A REVISAR, operativo: false}
+
+rubro_revisar: A REVISAR
+
+# Reglas típicas proveedor -> rubro (texto contenido en el nombre, sin importar mayúsculas/acentos,
+# o CUIT exacto). Si un proveedor coincide con dos reglas, gana la PRIMERA.
+reglas_tipicas:
+  - {contiene: ELECTRICIDAD, rubro: Energía}
+  - {contiene: EDEMSA, rubro: Energía}
+  - {contiene: EDENOR, rubro: Energía}
+  - {contiene: EDESUR, rubro: Energía}
+  - {contiene: ECOGAS, rubro: Energía}
+  - {contiene: DISTRIBUIDORA DE GAS, rubro: Energía}
+  - {contiene: ESTACION DE SERV, rubro: Combustible y logística}
+  - {contiene: YPF, rubro: Combustible y logística}
+  - {contiene: AXION, rubro: Combustible y logística}
+  - {contiene: TELEFON, rubro: Servicios y telecomunicaciones}
+  - {contiene: TELECOM, rubro: Servicios y telecomunicaciones}
+  - {contiene: CLARO, rubro: Servicios y telecomunicaciones}
+  - {contiene: AGUAS, rubro: Servicios y telecomunicaciones}
+  - {contiene: SEGUROS, rubro: Seguros}
+  - {contiene: BANCO, rubro: Bancos}
+  - {contiene: CONSEJO PROFESIONAL, rubro: Honorarios}
+
+# Patrones sospechosos de gasto personal / ajeno a la operación -> A REVISAR (lista editable).
+patrones_revisar: [SALUD, AMBULATORIO, CLINICA, SANATORIO, MEDIC, ODONTO, FARMACIA, HOGAR, INDUMENTARIA,
+                   CALZADO, TURISMO, VIAJES, HOTEL, JUGUETERIA, COLEGIO, ESCUELA, GIMNASIO, PERFUMERIA,
+                   JOYERIA, OPTICA, VETERINARIA, COUNTRY]
+
+# Gastos que aparecen en el extracto bancario y no tienen factura en ARCA.
+movimientos_bancarios:
+  - {contiene: LEY 25413, rubro: Impuestos y tasas}
+  - {contiene: IMPUESTO DE SELLOS, rubro: Impuestos y tasas}
+  - {contiene: INTERESES SOBRE SALDOS, rubro: Bancos}
+
+# Textos del extracto que se marcan (alertas / señales).
+banco:
+  efectivo: [DEP.EFVO, DEPOSITO EN EFECTIVO, DEP. EFECTIVO]
+  haberes: [ACREDITAMIENTO DE HABERES, ACREDITAMIENTO DE, PAGO DE HABERES]
+
+caja:
+  cuentas_inversion: [FIMA, FONDO COMUN, FCI, PLAZO FIJO]
+  meses_promedio_gasto_fijo: 3
+
+# --------------------------------------------------------------------------- KPIs
+# id: nombre interno · base: fórmula de la biblioteca (si es distinta del id) · estrella: va en las
+# tarjetas grandes del tablero · meta / direccion (≥ o ≤) / tolerancia (en la unidad del KPI).
+kpis:
+  - {id: ventas_facturadas, estrella: true}
+  - {id: resultado_operativo, estrella: true, meta: 0, direccion: "≥", tolerancia: 300000}
+  - {id: resultado_operativo_pct, meta: 0.10, direccion: "≥", tolerancia: 0.05}
+  - {id: caja_dias, estrella: true, meta: 30, direccion: "≥", tolerancia: 10}
+  - {id: costo_laboral_ventas, estrella: true, meta: 0.30, direccion: "≤", tolerancia: 0.05}
+  - {id: ventas_totales}
+  - {id: ticket_promedio}
+  - {id: clientes_activos}
+  - {id: pct_recurrentes, meta: 0.5, direccion: "≥", tolerancia: 0.1}
+  - {id: clientes_nuevos}
+  - {id: clientes_perdidos}
+  - {id: concentracion_top10, meta: 0.6, direccion: "≤", tolerancia: 0.1}
+  - {id: ventas_vs_anio_anterior, meta: 0, direccion: "≥", tolerancia: 0.1}
+  - {id: margen_contribucion_pct}
+  - {id: punto_equilibrio_pesos}
+  - {id: iibb_cargas_ventas, meta: 0.15, direccion: "≤", tolerancia: 0.03}
+  - {id: gastos_a_revisar, meta: 0, direccion: "≤", tolerancia: 0}
+  - {id: personal_no_registrado_cant, meta: 0, direccion: "≤", tolerancia: 0}
+  - {id: personal_no_registrado_pct, meta: 0, direccion: "≤", tolerancia: 0}
+
+parte_operativo:
+  columnas: {}
+
+clientes:
+  dias_perdido: 60
+
+iibb:
+  actividades:
+    - {nombre: Actividad principal, alicuota: 0.035}
+  criterio: pendiente
+  usar_en_resultado: maximo

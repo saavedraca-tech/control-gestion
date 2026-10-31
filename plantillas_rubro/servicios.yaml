@@ -1,0 +1,29 @@
+# Plantilla SERVICIOS (estudios, consultoras, talleres, mantenimiento, salud…)
+hereda: generico
+nombre: Servicios
+descripcion: Vende horas o prestaciones; el costo laboral y la cobranza son la clave
+unidad_sugerida: {nombre: hora, plural: horas}
+rubro_principal: Honorarios
+
+rubros:
+  - {nombre: Honorarios, tipo: fijo}
+  - {nombre: Alquiler, tipo: fijo}
+
+kpis:
+  - {id: precio_promedio_unidad, nombre: "Valor promedio por hora facturada", estrella: true}
+  - {id: unidades_vendidas, nombre: "Horas facturadas", estrella: true}
+  - {id: honorarios_ventas, base: rubro_sobre_ventas, params: {rubro: Honorarios},
+     nombre: "Honorarios de terceros / ventas", meta: 0.2, direccion: "≤", tolerancia: 0.05}
+  - {id: concentracion_top10, estrella: true, meta: 0.7, direccion: "≤", tolerancia: 0.1}
+
+parte_operativo:
+  columnas:
+    fecha: fecha
+    unidades_vendidas: horas_facturadas
+    caja_efectivo: caja_efectivo
+
+iibb:
+  actividades:
+    - {nombre: Servicios, alicuota: 0.04}
+  criterio: porcentaje
+  porcentaje: {Servicios: 1.0}

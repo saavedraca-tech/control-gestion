@@ -1,0 +1,38 @@
+name: CI
+on:
+  push:
+  pull_request:
+jobs:
+  motor-y-api:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env: { POSTGRES_PASSWORD: postgres, POSTGRES_DB: cg_test }
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12", cache: pip }
+      - run: sudo apt-get update && sudo apt-get install -y poppler-utils
+      - run: pip install -r web/backend/requirements.txt
+      - name: Tests del motor (aceptación con Duclos + cliente sintético)
+        run: python -m pytest -q tests
+      - name: Tests del motor de ingesta
+        run: python -m pytest -q web/backend/ingesta
+      - name: Tests de la API (PostgreSQL)
+        env: { TEST_DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/cg_test" }
+        run: python -m pytest -q web/backend/tests
+  frontend:
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: web/frontend } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: npm, cache-dependency-path: web/frontend/package-lock.json }
+      - run: npm ci
+      - run: npx tsc --noEmit
+      - run: npx next build
+        env: { NEXT_TELEMETRY_DISABLED: "1" }
