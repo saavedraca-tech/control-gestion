@@ -115,15 +115,17 @@ def test_codigo_sin_datos_de_un_cliente():
 
 
 def test_todos_y_resumen_del_estudio(tmp_path):
-    base = copiar_base(tmp_path, ["duclos"])
+    hay_duclos = (RAIZ / "clientes" / "duclos" / "entrada").is_dir()   # no está en el repositorio (privacidad)
+    base = copiar_base(tmp_path, ["duclos"] if hay_duclos else [])
     sintetico.generar(base)
     assert cierre.main(["--todos", "--mes", "2026-03"], base=base) == 0
     ruta = base / "estudio" / "salida" / "2026-03" / "Resumen_estudio_2026-03.xlsx"
     ws = load_workbook(ruta)["Clientes"]
-    nombres = {ws.cell(row=r, column=2).value for r in range(5, 7)}
-    assert nombres == {"DUCLOS SAS", "Café Prueba Sintética"}
+    esperados = {"Café Prueba Sintética"} | ({"DUCLOS SAS"} if hay_duclos else set())
+    nombres = {ws.cell(row=r, column=2).value for r in range(5, 5 + len(esperados))}
+    assert nombres == esperados
     pbi = pd.read_parquet(base / "estudio" / "powerbi" / "hechos_kpis.parquet")
-    assert set(pbi["cliente_id"]) == {"duclos", "cafe_prueba_sintetica"}
+    assert set(pbi["cliente_id"]) == {"cafe_prueba_sintetica"} | ({"duclos"} if hay_duclos else set())
 
 
 def test_nuevo_cliente_interactivo(tmp_path):
